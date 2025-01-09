@@ -4,7 +4,7 @@ import numpy as np
 from torch.utils import data
 from PIL import Image, ImageFile
 import pickle
-import imageio
+import cv2
 
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
@@ -49,9 +49,14 @@ class synthiaDataSet(data.Dataset):
                     w = w / w.sum()
                     c = np.random.choice(self.NUM_CLASS, p=w)
 
-                    if ind[c] > (len(self.label_to_file[c]) - 1):
+                    # Reset index and shuffle if needed
+                    if ind[c] >= len(self.label_to_file[c]):
                         np.random.shuffle(self.label_to_file[c])
-                        ind[c] = ind[c] % (len(self.label_to_file[c]) - 1)
+                        ind[c] = 0
+
+                    # Safety check
+                    if len(self.label_to_file[c]) == 0:
+                        continue
 
                     c_file = self.label_to_file[c][ind[c]]
                     tmp_list.append(c_file)
@@ -121,7 +126,7 @@ class synthiaDataSet(data.Dataset):
         datafiles = self.data_list[index]
 
         image = Image.open(datafiles["img"]).convert('RGB')
-        label = np.asarray(imageio.imread(datafiles["label"], format='PNG-FI'))[:, :, 0]  # uint16
+        label = cv2.imread(datafiles["label"], cv2.IMREAD_UNCHANGED)[:, :, -1]
         name = datafiles["name"]
 
         # re-assign labels to match the format of Cityscapes
