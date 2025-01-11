@@ -6,7 +6,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.utils.data import DataLoader
 from torch.optim.lr_scheduler import LinearLR, SequentialLR, PolynomialLR, ConstantLR
-from geoopt.optim import RiemannianSGD, RiemannianAdam
+from hypll.optim import RiemannianSGD, RiemannianAdam
 
 from core.datasets import build_dataset
 from core.configs import cfg

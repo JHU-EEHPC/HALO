@@ -1,6 +1,6 @@
 from torch.optim import SGD, AdamW
 from torch.optim.lr_scheduler import LinearLR, SequentialLR, PolynomialLR, ConstantLR
-from geoopt.optim import RiemannianSGD, RiemannianAdam
+from hypll.optim import RiemannianSGD, RiemannianAdam
 
 optimizers = {
     "hyper": {"sgd": RiemannianSGD, "adam": AdamW},  # RiemannianAdam,

@@ -5,7 +5,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import geoopt.manifolds.stereographic.math as gmath
+import hypll.manifolds.poincare_ball.math.diffgeom as gmath
 
 import matplotlib.pyplot as plt
 
@@ -34,8 +34,8 @@ class HyperMapper(object):
         Returns:
             torch.Tensor: Tensor of shape (..., d)
         """
-        x_hyp = gmath.expmap0(x.double(), k=self.K, dim=dim)
-        x_hyp = gmath.project(x_hyp, k=self.K, dim=dim)
+        x_hyp = gmath.expmap0(x.double(), c=self.K, dim=dim)
+        x_hyp = gmath.project(x_hyp, c=self.K, dim=dim)
         return x_hyp
 
     def expmap2(self, inputs, dim=-1):
@@ -46,7 +46,7 @@ class HyperMapper(object):
         norm = torch.norm(inputs, dim=dim)  
         gamma = torch.tanh(sqrt_c * norm) / (sqrt_c * norm)  # sh ncls
         scaled_inputs = gamma.unsqueeze(dim) * inputs
-        return gmath.project(scaled_inputs, k=self.K, dim=dim, eps=PROJ_EPS)
+        return gmath.project(scaled_inputs, c=self.K, dim=dim, eps=PROJ_EPS)
 
     def logmap(self, x):
         """Logarithmic mapping from hyperbolic to Euclidean space.
@@ -57,7 +57,7 @@ class HyperMapper(object):
         Returns:
             torch.Tensor: Tensor of shape (..., d)
         """
-        return gmath.project(gmath.logmap0(x.double(), k=self.K), k=self.K)
+        return gmath.project(gmath.logmap0(x.double(), c=self.K), c=self.K)
 
     def poincare_distance(self, x, y):
         """Poincare distance between two points in hyperbolic space.
@@ -69,7 +69,7 @@ class HyperMapper(object):
         Returns:
             torch.Tensor: Tensor of shape (...)
         """
-        return gmath.dist(x, y, k=self.K)
+        return gmath.dist(x, y, c=self.K)
     
     def poincare_distance_origin(self, x, dim=-1):
         """Poincare distance between two points in hyperbolic space.
@@ -80,7 +80,7 @@ class HyperMapper(object):
         Returns:
             torch.Tensor: Tensor of shape (...)
         """
-        return gmath.dist0(x, k=self.K, dim=dim)
+        return gmath.dist(x, y=x.new_zeros(x.shape), c=self.K, dim=dim)
 
     def cosine_distance(self, x, y):
         """Cosine distance between two points.
